@@ -124,7 +124,7 @@ function loadAllModels() {
       (gltf) => {
         const obj = gltf.scene;
         obj.visible = false;
-        obj.scale.set(0.6, 0.6, 0.6);
+        obj.scale.set(0.01, 0.01, 0.01);
         obj.userData._materialCloned = false;
 
         three.models[key] = obj;
@@ -854,3 +854,4 @@ function screenToGround(sx, sy) {
     return fallback;
   }
 }
+
