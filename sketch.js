@@ -25,6 +25,18 @@ const SMOOTH = 0.25;
 const TEXTURE_MAX = 1200;
 
 // =====================
+// Debug: spawn marker
+// =====================
+let DEBUG_SPAWN = true;
+
+// 2D: 屏幕上的生成点（p5 画）
+let spawn2D = { x: 0, y: 0, ok: false };
+
+// 3D: Three.js 里的生成点（小球）
+let spawnMarker3D = null;
+
+
+// =====================
 // OpenCV init
 // =====================
 (function waitForCvAndInit() {
@@ -91,6 +103,14 @@ three.ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   three.scene.add(dir);
 
   three.root = new THREE.Group();
+
+    // ✅ 3D spawn marker（一个小球）
+  const g = new THREE.SphereGeometry(0.03, 16, 16);
+  const m = new THREE.MeshBasicMaterial({ color: 0xff00ff }); // 紫色
+  spawnMarker3D = new THREE.Mesh(g, m);
+  spawnMarker3D.visible = false;
+  three.scene.add(spawnMarker3D);
+
   three.scene.add(three.root);
 
   three.ready = true;
@@ -124,7 +144,7 @@ function loadAllModels() {
       (gltf) => {
         const obj = gltf.scene;
         obj.visible = false;
-        obj.scale.set(0.01, 0.01, 0.01);
+        obj.scale.set(0.06, 0.06, 0.06);
         obj.userData._materialCloned = false;
 
         three.models[key] = obj;
@@ -444,22 +464,55 @@ if (three.ready && objects.length > 0) {
     //    你现在 ROI 的真实尺寸是 roiSize（不是 boxSize）
     const sx = bx + (cx / roiSize) * boxSize;
     const sy = by + (cy / roiSize) * boxSize;
-
     // ④ 屏幕点 -> 3D 地面点
     const hit = screenToGround(sx, sy);
+
+        // ✅ 记录 2D 生成点（屏幕坐标，p5 用来画）
+    spawn2D.x = sx;
+    spawn2D.y = sy;
+    spawn2D.ok = !!hit;
+
+    // ✅ 更新 3D 生成点标记（未平滑前：hit；平滑后：spawn3D）
+    if (spawnMarker3D) {
+      spawnMarker3D.visible = !!hit;
+      if (hit) spawnMarker3D.position.copy(hit); // 你也可以改成 spawn3D 看“平滑后”的点
+    }
+
 
     // ⑤ 平滑 + 放置模型
     if (hit) {
       spawn3D.lerp(hit, SPAWN_SMOOTH);
 
       // ✅ 轻微抬起一点，避免“埋进地面”
-      three.current.position.set(spawn3D.x, spawn3D.y + 0.05, spawn3D.z);
+    //  three.current.position.set(spawn3D.x, spawn3D.y + 0.05, spawn3D.z);
     }
 
     // 让它慢慢转（方便你确认它在动）
    // three.current.rotation.y += 0.01;
   }
 }
+
+  // =====================
+  // Debug draw: 2D spawn marker
+  // =====================
+  if (DEBUG_SPAWN && spawn2D.ok) {
+    push();
+    stroke(255, 0, 255);
+    strokeWeight(3);
+    noFill();
+    // 圆圈
+    circle(spawn2D.x, spawn2D.y, 18);
+    // 十字
+    line(spawn2D.x - 14, spawn2D.y, spawn2D.x + 14, spawn2D.y);
+    line(spawn2D.x, spawn2D.y - 14, spawn2D.x, spawn2D.y + 14);
+
+    noStroke();
+    fill(255, 0, 255);
+    textSize(14);
+    text("spawn", spawn2D.x + 10, spawn2D.y - 10);
+    pop();
+  }
+
 
 
   // Render three
@@ -854,4 +907,3 @@ function screenToGround(sx, sy) {
     return fallback;
   }
 }
-
