@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta 
+    name="viewport" 
+    content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" 
+  />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+
+  <!-- p5.js（一定要最先） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+
+  <!-- OpenCV.js（你已有） -->
+  <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+
+  <!-- ✅ Three.js（就在这里加） -->
+ <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/build/three.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/three@0.145.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<body>
+  <!-- 你的所有 JS 都在 sketch.js -->
+  <script src="sketch.js"></script>
+</body>
+</html>
